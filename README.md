@@ -27,6 +27,42 @@ re-checks every hard constraint before anything is persisted or broadcast.
 6. Click **Explain** on any task to see the full decision trace: every
    candidate considered, their scores, and why the winner won.
 
+## Deploying a live demo (public URL)
+
+The app is a real server (WebSockets + an OR-Tools solver process), not a
+static site, so it needs two free-tier hosts — backend on Render, frontend
+on Vercel. Both connect directly to this GitHub repo; neither needs a
+local CLI or API key from you beyond signing in once.
+
+**1. Backend → Render**
+1. Go to [render.com](https://render.com) and sign in with GitHub.
+2. **New +** → **Blueprint** → select the `Maestro-AI` repo.
+3. Render reads `render.yaml` at the repo root automatically and shows one
+   service, `maestro-ai-backend`. Click **Apply**.
+4. Wait for the build (~3-5 min — it installs OR-Tools and trains the SLA
+   model). When it's live, copy the URL, e.g.
+   `https://maestro-ai-backend.onrender.com`.
+   - Free tier spins down after 15 minutes idle and reseeds fresh
+     deterministic demo data on the next request (`app/seed.py` runs on
+     every boot) — the first request after idle takes ~30-60s to wake up.
+
+**2. Frontend → Vercel**
+1. Go to [vercel.com](https://vercel.com) and sign in with GitHub.
+2. **Add New** → **Project** → select the same repo.
+3. Set **Root Directory** to `frontend` (Vercel auto-detects Next.js).
+4. Add two environment variables, using the Render URL from step 1:
+   - `NEXT_PUBLIC_API_URL` = `https://maestro-ai-backend.onrender.com`
+   - `NEXT_PUBLIC_WS_URL` = `wss://maestro-ai-backend.onrender.com`
+5. Click **Deploy**. You'll get a URL like `https://maestro-ai.vercel.app`
+   — that's the link to share.
+
+**3. Lock down CORS (30 seconds, do this last)**
+Back in the Render dashboard → the service → **Environment** → set
+`CORS_ORIGINS` to your exact Vercel URL (e.g.
+`https://maestro-ai.vercel.app`) instead of the blueprint's default `*`,
+then **Manual Deploy** → **Deploy latest commit**. This is the only step
+that can't be pre-filled since the Vercel URL doesn't exist until step 2.
+
 ## Quick start (Docker)
 
 ```bash

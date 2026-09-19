@@ -17,4 +17,8 @@ RUN python -m app.ml.train_sla
 
 EXPOSE 8000
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Seeds the demo dataset on every boot (idempotent, deterministic -- see
+# app/seed.py) then starts the API. Uses $PORT when the host platform
+# injects one (Render, Railway, Fly.io all do), falling back to 8000 for
+# local `docker run` / docker-compose parity.
+CMD sh -c "python -m app.seed && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"

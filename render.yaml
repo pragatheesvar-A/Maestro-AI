@@ -1,0 +1,31 @@
+# Render Blueprint -- deploys the backend as a one-click service.
+# Usage: on render.com, "New +" -> "Blueprint" -> connect this GitHub repo.
+# Render reads this file automatically and provisions everything below.
+#
+# The frontend is deployed separately on Vercel (Next.js isn't a great fit
+# for Render's container model when Vercel does it natively and free) --
+# see README.md "Deploying a live demo" for that half.
+services:
+  - type: web
+    name: maestro-ai-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        value: sqlite:///./maestro.db
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ORIGINS
+        value: "*"
+        # ^ Tighten this to your exact Vercel URL once you have it, e.g.
+        # https://maestro-ai.vercel.app -- see README for the redeploy step.
+      - key: LLM_MODEL
+        value: claude-sonnet-5
+      - key: ANTHROPIC_API_KEY
+        sync: false
+        # ^ optional: set in the Render dashboard if you want LLM-phrased
+        # explanations. The app works fully without it (deterministic
+        # fallback).
