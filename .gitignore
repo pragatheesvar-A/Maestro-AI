@@ -1,0 +1,31 @@
+# Python
+backend/venv/
+backend/__pycache__/
+backend/**/__pycache__/
+backend/*.db
+backend/test_*.db
+backend/alembic_*.db
+backend/.pytest_cache/
+backend/app/ml/*.pkl
+
+# Node / Next.js
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/.env.local
+
+# Env
+.env
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Archives / exports (never part of source control)
+*.zip
+*.7z
+*.tar.gz
+
+# Editor
+.vscode/
+.idea/
